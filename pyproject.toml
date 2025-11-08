@@ -1,0 +1,15 @@
+[project]
+name = "integracao-sus-ibge"
+version = "0.1.0"
+description = "Trabalho da disciplina de Gerenciamento de Serviços no Ciberespaço"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
+    "plotly>=6.4.0",
+    "statsmodels>=0.14.5",
+    "streamlit>=1.51.0",
+    "unidecode>=1.4.0",
+    "xlrd>=2.0.2",
+]
