@@ -8,7 +8,7 @@ Visualização interativa de dados do SUS (atendimentos) e IBGE (dados socioecon
 
 ## Como executar no Windows
 
-1. Instalar `uv` via PowerShell  
+1. Instale `uv` via PowerShell  
 
 ```bash
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
