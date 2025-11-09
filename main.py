@@ -23,6 +23,7 @@ def main():
         2. Ajuste de "Itapagé" para "Itapajé".
         3. Remoção de espaços em excesso após os nomes das cidades.
         4. Não há registro sobre período em que esses dados foram coletados. Conclusões quanto a, por exemplo, quantidade de atendimentos por 100 mil habitantes podem ser referentes a um ou vários anos.
+        5. Os nomes contidos no arquivo não parecem contribuir para uma interpretação aprofundada dos dados.
 
         ### Outras fontes de dados
 
@@ -51,9 +52,12 @@ def main():
 
     #comparação entre regiões de planejamento
     df['atendimentos_por_100k'] = (df['n_atendimentos'] / df['populacao']) * 100_000
+
+    # Adiciona cálculo da média de IDH para cada região
     df_regiao = df.groupby('regiao_planejamento').agg(
         total_atendimentos=('n_atendimentos', 'sum'),
-        media_por_100k=('atendimentos_por_100k', 'mean')
+        media_por_100k=('atendimentos_por_100k', 'mean'),
+        media_idh=('idh_2010', 'mean')
     ).reset_index()
     fig_media = px.bar(
         df_regiao.sort_values('media_por_100k', ascending=False),
@@ -175,6 +179,50 @@ def main():
         - Cidades com maior IDH também têm maiores populações, impactando a estimativa.
         - Reforça hipótese de maior dependência do SUS em áreas de menor IDH (que acabam tendo menor disponibilidade de serviços de saúde também).
         """)
+    
+    st.subheader("Correlação entre IDH médio e média de atendimentos por 100 mil habitantes (por região)")
+
+    corr_value = df_regiao['media_idh'].corr(df_regiao['media_por_100k'])
+        # Interpretação textual do coeficiente
+    if corr_value > 0.7:
+        interpretacao = "Correlação positiva forte"
+        cor = "green"
+    elif corr_value > 0.3:
+        interpretacao = "Correlação positiva moderada"
+        cor = "lightgreen"
+    elif corr_value > -0.3:
+        interpretacao = "Correlação fraca ou inexistente"
+        cor = "gray"
+    elif corr_value > -0.7:
+        interpretacao = "Correlação negativa moderada"
+        cor = "orange"
+    else:
+        interpretacao = "Correlação negativa forte"
+        cor = "red"
+
+    st.markdown(
+        f"""
+        <div style='text-align:center; padding:15px; border-radius:10px; background-color:{cor}; color:white'>
+            <h3>Coeficiente de Correlação (Pearson): {corr_value:.3f}</h3>
+            <p>{interpretacao}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown("""
+        - Observa-se uma correlação negativa entre o IDH médio da região e a quantidade média de atendimentos por 100 mil habitantes.
+        - Regiões com **menor IDH** apresentam **maior média de atendimentos proporcionais**, indicando maior dependência do SUS.
+        - O coeficiente de correlação mostra a **intensidade e direção** dessa relação.
+        """)
+    
+    st.subheader("Conclusão")
+    
+    st.markdown("""
+        Por fim, além de todas as indicações já demonstradas anteriormente, percebe-se que há uma correlação negativa moderada entre IDH e quantidade média de atendimentos. Podemos ter isso como um indicativo que o IDH, por si só, não é o único indicador do aumento de atendimentos, como é o caso do aumento populacional, que também tende a aumentar essa média. 
+                
+        Além disso, a base de dados com o nome dos municípios e nomes não parece ter nenhuma relação forte ou indicativo que auxilie na interpretação das informações, não havendo como realizar um cruzamento entre esses dados.
+    """)
 
 if __name__ == "__main__":
     main()
